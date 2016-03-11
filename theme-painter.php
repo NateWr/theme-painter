@@ -259,6 +259,11 @@ if ( !function_exists( 'theme_painter_compile_styles' ) ) {
 			return '';
 		}
 
+		$transient = get_transient( 'theme_painter_compiled_styles' );
+		if ( !empty( $transient ) ) {
+			return $transient;
+		}
+
 		// Dump all colors into one array
 		$colors = array();
 
@@ -307,6 +312,8 @@ if ( !function_exists( 'theme_painter_compile_styles' ) ) {
 			}
 		}
 
+		set_transient( 'theme_painter_compiled_styles', $output );
+
 		return $output;
 	}
 }
@@ -351,4 +358,17 @@ if ( !function_exists( 'theme_painter_print_style_tag' ) ) {
 </script>
 		<?php
 	}
+}
+
+if ( !function_exists( 'theme_painter_bust_transient_cache' ) ) {
+	/**
+	 * Bust the transient cache with the built styles whenever the customizer
+	 * is saved.
+	 *
+	 * @since 0.1
+	 */
+	function theme_painter_bust_transient_cache( $wp_customize ) {
+		delete_transient( 'theme_painter_compiled_styles' );
+	}
+	add_action( 'customize_save', 'theme_painter_bust_transient_cache' );
 }
