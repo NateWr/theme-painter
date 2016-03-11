@@ -36,6 +36,10 @@ if ( !function_exists( 'theme_painter_customize_register' ) ) {
 
 		$colors = theme_painter_get_settings();
 
+		if ( empty( $colors ) ) {
+			return;
+		}
+
 		$capability = empty( $colors['capability'] ) ? 'edit_theme_options' : $colors['capability'];
 
 		// Add panels
@@ -188,20 +192,6 @@ if ( !function_exists( 'theme_painter_register_colors' ) ) {
 	}
 }
 
-if ( !function_exists( 'theme_painter_enqueue_scripts' ) ) {
-	/**
-	 * Print custom color styles on the frontend
-	 *
-	 * @since 0.1
-	 */
-	function theme_painter_enqueue_scripts() {
-
-		$colors = theme_painter_get_settings();
-		print_r( $colors );
-	}
-	add_action( 'wp_enqueue_scripts', 'theme_painter_enqueue_scripts' );
-}
-
 if ( !function_exists( 'theme_painter_sanitize_hex_color' ) ) {
 	/**
 	 * Sanitizes a hex color.
@@ -225,5 +215,137 @@ if ( !function_exists( 'theme_painter_sanitize_hex_color' ) ) {
 		}
 
 		return null;
+	}
+}
+
+if ( !function_exists( 'theme_painter_enqueue_scripts' ) ) {
+	/**
+	 * Print custom color styles on the frontend
+	 *
+	 * @since 0.1
+	 */
+	function theme_painter_enqueue_scripts() {
+
+		$colors = theme_painter_get_settings();
+
+		if ( empty( $colors ) ) {
+			return;
+		}
+
+		if ( !empty( $colors['stylesheet'] ) ) {
+			wp_add_inline_style( $colors['stylesheet'], theme_painter_compile_styles() );
+		} else {
+			add_action( 'wp_head', 'theme_painter_print_style_tag' );
+		}
+	}
+	add_action( 'wp_enqueue_scripts', 'theme_painter_enqueue_scripts', 20 );
+}
+
+if ( !function_exists( 'theme_painter_compile_styles' ) ) {
+	/**
+	 * Compile styles
+	 *
+	 * @since 0.1
+	 * @return string
+	 */
+	function theme_painter_compile_styles() {
+
+		$config = theme_painter_get_settings();
+
+		if ( empty( $config ) ) {
+			return '';
+		}
+
+		// Dump all colors into one array
+		$colors = array();
+
+		if ( !empty( $config['panels'] ) && is_array( $config['panels'] ) ) {
+			foreach ( $config['panels'] as $panel ) {
+				$config['sections'] = !empty( $config['sections'] ) ? array_merge( $config['sections'], $panel['sections'] ) : $panel['sections'];
+			}
+		}
+
+		if ( !empty( $config['sections']) && is_array( $config['sections'] ) ) {
+			foreach( $config['sections']  as $section ) {
+				$config['colors'] = !empty( $config['colors'] ) ? array_merge( $config['colors'], $section['colors'] ) : $section['colors'];
+			}
+		}
+
+		if ( !empty( $config['colors']) && is_array( $config['colors'] ) ) {
+			$colors = $config['colors'];
+		}
+
+		$output = '';
+
+		foreach( $colors as $color_id => $color ) {
+
+			$color['value'] = get_theme_mod( 'theme_painter_setting_' . sanitize_key( $color_id ), $color['default'] );
+
+			if ( $color['value'] == $color['default'] ) {
+				continue;
+			}
+
+			if ( !is_array( $color['selectors'] ) ) {
+				$color['selectors'] = array( $color['selectors'] );
+				$color['attributes'] = array( $color['attributes'] );
+				if ( !empty( $color['queries'] ) ) {
+					$color['queries'] = array( $color['queries'] );
+				}
+			}
+
+			for( $i = 0; $i < count( $color['selectors'] ); $i++ ) {
+
+				$query = '';
+				if ( !empty( $color['queries'] ) && !empty( $color['queries'][$i] ) ) {
+					$query = $color['queries'][$i];
+				}
+
+				$output .= theme_painter_build_style_rule( $color['selectors'][$i], $color['attributes'][$i], $color['value'], $query );
+			}
+		}
+
+		return $output;
+	}
+}
+
+if ( !function_exists( 'theme_painter_build_style_rule' ) ) {
+	/**
+	 * Build a style rule from params
+	 *
+	 * @since 0.1
+	 */
+	function theme_painter_build_style_rule( $selector, $attribute, $value, $query = '' ) {
+
+		$output = '';
+
+		if ( !empty( $query ) ) {
+			$output .= $query . '{';
+		}
+
+		$output .= $selector . '{' . $attribute . ':' . $value . '}';
+
+		if ( !empty( $query ) ) {
+			$output .= '}';
+		}
+
+		return $output;
+	}
+}
+
+if ( !function_exists( 'theme_painter_print_style_tag' ) ) {
+	/**
+	 * Print custom color styles directly into a <style> tag
+	 *
+	 * Used to print directly into the <head> if theme painter doesn't have a
+	 * stylesheet to attach to.
+	 *
+	 * @since 0.1
+	 */
+	function theme_painter_print_style_tag() {
+		?>
+<script id='theme-painter-styles' type='text/css'>
+	<?php echo theme_painter_compile_styles(); ?>
+</script>
+		<?php
 	}
 }

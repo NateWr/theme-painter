@@ -8,11 +8,16 @@ output to pre-defined CSS rules on the frontend.
 Inspired by [Colorcase](https://github.com/UpThemes/Colorcase) by [UpThemes](https://upthemes.com/).
 
 
-## Add a panel with a section with a control
+## Setup
 ```
 include_once( 'theme-painter.php' );
 
 $args = array(
+
+	// The library will output stylesheets directly after the stylesheet with
+	// the following handle is printed. If left out, it will print directly into
+	// head.
+	'stylesheet' => 'theme-stylesheet-handle',
 
 	// Panels
 	'panels' => array(
@@ -21,11 +26,14 @@ $args = array(
 			'title' => __( 'Theme Colors', 'theme-slug' ),
 			'priority' => 30,
 
+			// Sections
 			'sections' => array(
 
 				'general' => array(
 					'title' => __( 'General Colors', 'theme-slug' ),
 					'priority' => 20,
+
+					// Controls
 					'colors' => array(
 						'background' => array(
 							'label' => __( 'Background Color', 'theme-slug' ),
