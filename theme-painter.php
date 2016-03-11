@@ -233,7 +233,10 @@ if ( !function_exists( 'theme_painter_enqueue_scripts' ) ) {
 		}
 
 		if ( !empty( $colors['stylesheet'] ) ) {
-			wp_add_inline_style( $colors['stylesheet'], theme_painter_compile_styles() );
+			$styles = theme_painter_compile_styles();
+			if ( !empty( $styles ) ) {
+				wp_add_inline_style( $colors['stylesheet'], $styles );
+			}
 		} else {
 			add_action( 'wp_head', 'theme_painter_print_style_tag' );
 		}
