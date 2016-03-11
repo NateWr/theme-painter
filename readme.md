@@ -10,6 +10,8 @@ Inspired by [Colorcase](https://github.com/UpThemes/Colorcase) by [UpThemes](htt
 
 ## Add a panel with a section with a control
 ```
+include_once( 'theme-painter.php' );
+
 $args = array(
 
 	// Panels
@@ -49,6 +51,8 @@ add_theme_support( 'theme-painter', $args );
 
 ## Add a section with controls
 ```
+include_once( 'theme-painter.php' );
+
 $args = array(
 
 	'sections' => array(
@@ -76,6 +80,8 @@ add_theme_support( 'theme-painter', $args );
 
 ## Add a control to the core `colors` section
 ```
+include_once( 'theme-painter.php' );
+
 $args = array(
 
 	'colors' => array(
@@ -94,6 +100,8 @@ add_theme_support( 'theme-painter', $args );
 
 ## Add a control to a pre-existing section
 ```
+include_once( 'theme-painter.php' );
+
 $args = array(
 
 	'colors' => array(
@@ -115,6 +123,8 @@ add_theme_support( 'theme-painter', $args );
 
 ## Pass CSS selectors and attributes as strings or arrays, and match them up with media queries
 ```
+include_once( 'theme-painter.php' );
+
 $args = array(
 
 	'colors' => array(
@@ -135,6 +145,8 @@ add_theme_support( 'theme-painter', $args );
 
 ## Use any arguments supported by `add_panel`, `add_section` and `add_control`
 ```
+include_once( 'theme-painter.php' );
+
 $args = array(
 
 	'panels' => array(
