@@ -16,13 +16,13 @@ if ( !function_exists( 'theme_painter_get_settings' ) ) {
 	 */
 	function theme_painter_get_settings() {
 
-		$theme_painter = get_theme_support( 'theme-painter' );
+		$config = get_theme_support( 'theme-painter' );
 
-		if ( empty( $theme_painter ) || empty( $theme_painter[0] || empty( $theme_painter[0]['sections'] ) ) ) {
+		if ( empty( $config ) || empty( $config[0] || empty( $config[0] ) ) ) {
 			return array();
 		}
 
-		return $theme_painter[0];
+		return $config[0];
 	}
 }
 
@@ -34,27 +34,27 @@ if ( !function_exists( 'theme_painter_customize_register' ) ) {
 	 */
 	function theme_painter_customize_register( $wp_customize ) {
 
-		$colors = theme_painter_get_settings();
+		$config = theme_painter_get_settings();
 
-		if ( empty( $colors ) ) {
+		if ( empty( $config ) ) {
 			return;
 		}
 
-		$capability = empty( $colors['capability'] ) ? 'edit_theme_options' : $colors['capability'];
+		$capability = empty( $config['capability'] ) ? 'edit_theme_options' : $config['capability'];
 
 		// Add panels
-		if ( !empty( $colors['panels'] ) && is_array( $colors['panels'] ) ) {
-			theme_painter_register_panels( $colors['panels'], $capability );
+		if ( !empty( $config['panels'] ) && is_array( $config['panels'] ) ) {
+			theme_painter_register_panels( $config['panels'], $capability );
 		}
 
 		// Add sections without panels
-		if ( !empty( $colors['sections']) && is_array( $colors['sections'] ) ) {
-			theme_painter_register_sections( $colors['sections'] );
+		if ( !empty( $config['sections']) && is_array( $config['sections'] ) ) {
+			theme_painter_register_sections( $config['sections'] );
 		}
 
 		// Add color controls to the core `colors` section
-		if ( !empty( $colors['colors']) && is_array( $colors['colors'] ) ) {
-			theme_painter_register_colors( $colors['colors'] );
+		if ( !empty( $config['colors']) && is_array( $config['colors'] ) ) {
+			theme_painter_register_colors( $config['colors'] );
 		}
 	}
 	add_action( 'customize_register', 'theme_painter_customize_register' );
@@ -264,8 +264,42 @@ if ( !function_exists( 'theme_painter_compile_styles' ) ) {
 			return $transient;
 		}
 
-		// Dump all colors into one array
+		$colors = theme_painter_get_colors();
+
+		$output = '';
+
+		foreach( $colors as $color_id => $color ) {
+
+			$color['value'] = get_theme_mod( 'theme_painter_setting_' . sanitize_key( $color_id ), $color['default'] );
+
+			if ( $color['value'] == $color['default'] ) {
+				continue;
+			}
+
+			$output .= theme_painter_get_color_styles( $color );
+		}
+
+		set_transient( 'theme_painter_compiled_styles', $output );
+
+		return $output;
+	}
+}
+
+if ( !function_exists( 'theme_painter_get_colors' ) ) {
+	/**
+	 * Retrieve one array containing all registered colors
+	 *
+	 * @since 0.1
+	 */
+	function theme_painter_get_colors() {
+
 		$colors = array();
+
+		$config = theme_painter_get_settings();
+
+		if ( empty( $config ) ) {
+			return $colors;
+		}
 
 		if ( !empty( $config['panels'] ) && is_array( $config['panels'] ) ) {
 			foreach ( $config['panels'] as $panel ) {
@@ -283,36 +317,37 @@ if ( !function_exists( 'theme_painter_compile_styles' ) ) {
 			$colors = $config['colors'];
 		}
 
-		$output = '';
+		return $colors;
+	}
+}
 
-		foreach( $colors as $color_id => $color ) {
+if ( !function_exists( 'theme_painter_get_color_styles' ) ) {
+	/**
+	 * Get all style rules attached to a color
+	 *
+	 * @since 0.1
+	 */
+	function theme_painter_get_color_styles( $color ) {
 
-			$color['value'] = get_theme_mod( 'theme_painter_setting_' . sanitize_key( $color_id ), $color['default'] );
-
-			if ( $color['value'] == $color['default'] ) {
-				continue;
-			}
-
-			if ( !is_array( $color['selectors'] ) ) {
-				$color['selectors'] = array( $color['selectors'] );
-				$color['attributes'] = array( $color['attributes'] );
-				if ( !empty( $color['queries'] ) ) {
-					$color['queries'] = array( $color['queries'] );
-				}
-			}
-
-			for( $i = 0; $i < count( $color['selectors'] ); $i++ ) {
-
-				$query = '';
-				if ( !empty( $color['queries'] ) && !empty( $color['queries'][$i] ) ) {
-					$query = $color['queries'][$i];
-				}
-
-				$output .= theme_painter_build_style_rule( $color['selectors'][$i], $color['attributes'][$i], $color['value'], $query );
+		if ( !is_array( $color['selectors'] ) ) {
+			$color['selectors'] = array( $color['selectors'] );
+			$color['attributes'] = array( $color['attributes'] );
+			if ( !empty( $color['queries'] ) ) {
+				$color['queries'] = array( $color['queries'] );
 			}
 		}
 
-		set_transient( 'theme_painter_compiled_styles', $output );
+		$output = '';
+
+		for( $i = 0; $i < count( $color['selectors'] ); $i++ ) {
+
+			$query = '';
+			if ( !empty( $color['queries'] ) && !empty( $color['queries'][$i] ) ) {
+				$query = $color['queries'][$i];
+			}
+
+			$output .= theme_painter_build_style_rule( $color['selectors'][$i], $color['attributes'][$i], $color['value'], $query );
+		}
 
 		return $output;
 	}
@@ -320,7 +355,7 @@ if ( !function_exists( 'theme_painter_compile_styles' ) ) {
 
 if ( !function_exists( 'theme_painter_build_style_rule' ) ) {
 	/**
-	 * Build a style rule from params
+	 * Build a single style rule from params
 	 *
 	 * @since 0.1
 	 */
@@ -371,4 +406,33 @@ if ( !function_exists( 'theme_painter_bust_transient_cache' ) ) {
 		delete_transient( 'theme_painter_compiled_styles' );
 	}
 	add_action( 'customize_save', 'theme_painter_bust_transient_cache' );
+}
+
+if ( !function_exists( 'theme_painter_load_live_preview' ) ) {
+	/**
+	 * Enqueue the live preview scripts
+	 *
+	 * @since 0.1
+	 */
+	function theme_painter_load_live_preview() {
+
+		$config = theme_painter_get_settings();
+
+		if ( empty( $config ) || empty( $config['lib_url'] ) ) {
+			return;
+		}
+
+		wp_enqueue_script( 'theme-painter-live-preview', trailingslashit( $config['lib_url'] ) . 'theme-painter-live-preview.js', array( 'jquery', 'customize-preview' ), '0.1', true );
+
+		$colors = theme_painter_get_colors();
+
+		$settings = array();
+		foreach( $colors as $color_id => $color ) {
+			$color['value'] = '%value%';
+			$settings['theme_painter_setting_' . sanitize_key( $color_id )] = theme_painter_get_color_styles( $color );
+		}
+
+		wp_localize_script( 'theme-painter-live-preview', 'theme_painter_live_preview_settings', $settings );
+	}
+	add_action( 'customize_preview_init' , 'theme_painter_load_live_preview' );
 }
