@@ -335,6 +335,9 @@ if ( !function_exists( 'theme_painter_get_color_styles' ) ) {
 			if ( !empty( $color['queries'] ) ) {
 				$color['queries'] = array( $color['queries'] );
 			}
+			if ( !empty( $color['important'] ) ) {
+				$color['important'] = array( $color['important'] );
+			}
 		}
 
 		$output = '';
@@ -346,7 +349,14 @@ if ( !function_exists( 'theme_painter_get_color_styles' ) ) {
 				$query = $color['queries'][$i];
 			}
 
-			$output .= theme_painter_build_style_rule( $color['selectors'][$i], $color['attributes'][$i], $color['value'], $query );
+			$important = '';
+			if ( !empty( $color['important'] ) && !empty( $color['important'][$i] ) ) {
+				$important = $color['important'][$i];
+			}
+
+			$value = !empty( $color['set_values'] ) && !empty( $color['set_values'][$i] ) ? $color['set_values'][$i] : $color['value'];
+
+			$output .= theme_painter_build_style_rule( $color['selectors'][$i], $color['attributes'][$i], $value, $query, $important );
 		}
 
 		return $output;
@@ -359,7 +369,11 @@ if ( !function_exists( 'theme_painter_build_style_rule' ) ) {
 	 *
 	 * @since 0.1
 	 */
-	function theme_painter_build_style_rule( $selector, $attribute, $value, $query = '' ) {
+	function theme_painter_build_style_rule( $selector, $attribute, $value, $query = '', $important = '' ) {
+
+		if ( !empty( $important ) ) {
+			$value .= '!important';
+		}
 
 		$output = '';
 
@@ -435,4 +449,35 @@ if ( !function_exists( 'theme_painter_load_live_preview' ) ) {
 		wp_localize_script( 'theme-painter-live-preview', 'theme_painter_live_preview_settings', $settings );
 	}
 	add_action( 'customize_preview_init' , 'theme_painter_load_live_preview' );
+}
+
+if ( !function_exists( 'theme_painter_is_color_dark' ) ) {
+	/**
+	 * Check if the passed color is dark
+	 *
+	 * This is a utility function in case you need to print additional styles
+	 * based on the brightness or darkness of a color. You can specify the
+	 * brightness threshold by passing in a $limit value. Higher values are
+	 * brighter.
+	 *
+	 * Based on: http://stackoverflow.com/a/8468448/1723499
+	 *
+	 * @since 0.1
+	 */
+	function theme_painter_is_color_dark( $color, $limit = 130 ) {
+
+		$color = str_replace( '#', '', $color );
+
+		$r = hexdec( substr( $color, 0, 2 ) );
+		$g = hexdec( substr( $color, 2, 2 ) );
+		$b = hexdec( substr( $color, 4, 2 ) );
+
+		$contrast = sqrt(
+			$r * $r * .241 +
+			$g * $g * .691 +
+			$b * $b * .068
+		);
+
+		return $contrast < $limit;
+	}
 }

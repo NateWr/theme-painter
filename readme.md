@@ -129,7 +129,7 @@ $args = array(
 add_theme_support( 'theme-painter', $args );
 ```
 
-## Pass CSS selectors and attributes as strings or arrays, and match them up with media queries
+## Pass CSS selectors and attributes as strings or arrays, and match them up with media queries or attach an !important override
 ```
 include_once( 'theme-painter.php' );
 
@@ -139,9 +139,10 @@ $args = array(
 
 		'background' => array(
 			'label' => __( 'Background Color', 'theme-slug' ),
-			'selectors' => array( 'body', 'footer', 'header' ),
-			'attributes' => array( 'background', 'background-color', 'background-color' ),
-			'queries' => array( '', '', '@mediai(min-width: 768px)' ),
+			'selectors' => array( 'body', 'footer', 'header', '.entry-title' ),
+			'attributes' => array( 'background', 'background-color', 'background-color', 'entry-title' ),
+			'queries' => array( '', '', '@mediai(min-width: 768px)', '' ),
+			'important' => array( false, false, false, true ),
 			'default' => '#fafafa',
 		),
 	),
@@ -150,6 +151,48 @@ $args = array(
 add_theme_support( 'theme-painter', $args );
 ```
 
+## Generate styles with set values based on the value of another color
+```
+include_once( 'theme-painter.php' );
+
+$args = array(
+
+	'colors' => array(
+
+		'background' => array(
+			'label' => __( 'Background Color', 'theme-slug' ),
+			// Notice the call to a function to return the selectors
+			'selectors' => array( 'body', get_selectors() ),
+			'attributes' => array( 'background', 'border-color' ),
+			'set_values' => array( false, rgba(255,255,255,0.3) ),
+			'default' => '#fafafa',
+		),
+	),
+);
+
+function get_selectors() {
+
+	// Retrieve an array of all color settings + values
+	$colors = theme_painter_get_colors();
+
+	// Determine if the `background` color value is dark
+	// theme_painter_is_color_dark() is a utility function available whenever
+	// the lib is loaded. You can pass a custom brightness threshold.
+	$background_is_dark = theme_painter_is_color_dark( $colors['background']['value'] );
+
+	// Return an empty set of selectors to do nothing if the background is light
+	if ( !$background_is_dark ) {
+		return array();
+	}
+
+	// Add selectors if the background is dark
+	$selectors = array( 'article', '.entry-title' );
+
+	return $selectors;
+}
+
+add_theme_support( 'theme-painter', $args );
+```
 
 ## Use any arguments supported by `add_panel`, `add_section` and `add_control`
 ```
