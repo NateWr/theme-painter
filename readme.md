@@ -14,9 +14,9 @@ include_once( 'theme-painter.php' );
 
 $args = array(
 
-	// The library will output stylesheets directly after the stylesheet with
-	// the following handle is printed. If left out, it will print directly into
-	// head.
+	// The library will output stylesheets directly after the following
+	// stylesheet is printed. If left out, it will print directly into the head.
+	// This is the `handle`.
 	'stylesheet' => 'theme-stylesheet-handle',
 
 	// Panels
@@ -141,7 +141,7 @@ $args = array(
 			'label' => __( 'Background Color', 'theme-slug' ),
 			'selectors' => array( 'body', 'footer', 'header', '.entry-title' ),
 			'attributes' => array( 'background', 'background-color', 'background-color', 'entry-title' ),
-			'queries' => array( '', '', '@mediai(min-width: 768px)', '' ),
+			'queries' => array( '', '', '@media(min-width: 768px)', '' ),
 			'important' => array( false, false, false, true ),
 			'default' => '#fafafa',
 		),
