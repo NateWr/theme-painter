@@ -18,7 +18,7 @@ if ( !function_exists( 'theme_painter_get_settings' ) ) {
 
 		$config = get_theme_support( 'theme-painter' );
 
-		if ( empty( $config ) || empty( $config[0] || empty( $config[0] ) ) ) {
+		if ( empty( $config ) || empty( $config[0] ) || empty( $config[0] ) ) {
 			return array();
 		}
 
