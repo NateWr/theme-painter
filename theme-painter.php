@@ -168,14 +168,15 @@ if ( !function_exists( 'theme_painter_register_colors' ) ) {
 
 			$color = apply_filters( 'theme_painter_color', $color );
 
-			$setting_args = array(
-				'sanitize_callback' => $color['sanitize_callback'],
-				'transport' => empty( $color['transport'] ) ? 'postMessage' : $color['transport'],
-				'capability' => $color['capability'],
-				'default' => $color['default'],
+			$wp_customize->add_setting(
+				'theme_painter_setting_' . sanitize_key( $color_id ),
+				array(
+					'sanitize_callback' => $color['sanitize_callback'],
+					'transport' => empty( $color['transport'] ) ? 'postMessage' : $color['transport'],
+					'capability' => $color['capability'],
+					'default' => $color['default'],
+				)
 			);
-
-			$wp_customize->add_setting( 'theme_painter_setting_' . sanitize_key( $color_id ), $setting_args );
 
 			$color_args = $color;
 			unset( $color_args['sanitize_callback'] );
