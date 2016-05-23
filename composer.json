@@ -1,0 +1,16 @@
+{
+  "name"       : "NateWr/theme-painter",
+  "description": "Theme Painter is a simple library for adding color options to your WordPress theme.",
+  "keywords"   : ["wordpress"],
+  "homepage"   : "https://github.com/NateWr/theme-painter/",
+  "license"    : "GPL-2.0+",
+  "authors"    : [
+    {
+      "name"    : "Nate Wright",
+      "homepage": "http://themeofthecrop.com"
+    }
+  ],
+  "support"    : {
+    "issues": "https://github.com/NateWr/theme-painter/issues"
+  }
+}
