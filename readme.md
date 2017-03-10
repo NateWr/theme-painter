@@ -23,26 +23,26 @@ $args = array(
 	'panels' => array(
 
 		'theme-colors' => array(
-			'title' => __( 'Theme Colors', 'theme-slug' ),
+			'title' => esc_html__( 'Theme Colors', 'theme-slug' ),
 			'priority' => 30,
 
 			// Sections
 			'sections' => array(
 
 				'general' => array(
-					'title' => __( 'General Colors', 'theme-slug' ),
+					'title' => esc_html__( 'General Colors', 'theme-slug' ),
 					'priority' => 20,
 
 					// Controls
 					'colors' => array(
 						'background' => array(
-							'label' => __( 'Background Color', 'theme-slug' ),
+							'label' => esc_html__( 'Background Color', 'theme-slug' ),
 							'selectors' => 'body',
 							'attributes' => 'background',
 							'default' => '#fafafa',
 						),
 						'text' => array(
-							'label' => __( 'Text Color', 'theme-slug' ),
+							'label' => esc_html__( 'Text Color', 'theme-slug' ),
 							'selectors' => 'body',
 							'attributes' => 'color',
 							'default' => '#242424',
@@ -67,13 +67,13 @@ $args = array(
 
 		// Add a custom color section
 		'custom-color-section' => array(
-			'title' => __( 'Custom Color Section', 'theme-slug' ),
+			'title' => esc_html__( 'Custom Color Section', 'theme-slug' ),
 
 			// Add color controls to the section
 			'colors' => array(
 
 				'background' => array(
-					'label' => __( 'Background Color', 'theme-slug' ),
+					'label' => esc_html__( 'Background Color', 'theme-slug' ),
 					'selectors' => 'body',
 					'attributes' => 'background',
 					'default' => '#fafafa',
@@ -95,7 +95,7 @@ $args = array(
 	'colors' => array(
 
 		'background' => array(
-			'label' => __( 'Background Color', 'theme-slug' ),
+			'label' => esc_html__( 'Background Color', 'theme-slug' ),
 			'selectors' => 'body',
 			'attributes' => 'background',
 			'default' => '#fafafa',
@@ -115,7 +115,7 @@ $args = array(
 	'colors' => array(
 
 		'background' => array(
-			'label' => __( 'Background Color', 'theme-slug' ),
+			'label' => esc_html__( 'Background Color', 'theme-slug' ),
 			'selectors' => 'body',
 			'attributes' => 'background',
 			'default' => '#fafafa',
@@ -138,7 +138,7 @@ $args = array(
 	'colors' => array(
 
 		'background' => array(
-			'label' => __( 'Background Color', 'theme-slug' ),
+			'label' => esc_html__( 'Background Color', 'theme-slug' ),
 			'selectors' => array( 'body', 'footer', 'header', '.entry-title' ),
 			'attributes' => array( 'background', 'background-color', 'background-color', 'entry-title' ),
 			'queries' => array( '', '', '@media(min-width: 768px)', '' ),
@@ -160,7 +160,7 @@ $args = array(
 	'colors' => array(
 
 		'background' => array(
-			'label' => __( 'Background Color', 'theme-slug' ),
+			'label' => esc_html__( 'Background Color', 'theme-slug' ),
 			// Notice the call to a function to return the selectors
 			'selectors' => array( 'body', get_selectors() ),
 			'attributes' => array( 'background', 'border-color' ),
@@ -205,7 +205,7 @@ $args = array(
 		// Panel
 		// See: https://developer.wordpress.org/reference/classes/wp_customize_manager/add_panel/
 		'theme-colors' => array(
-			'title' => __( 'Theme Colors', 'theme-slug' ), // required
+			'title' => esc_html__( 'Theme Colors', 'theme-slug' ), // required
 			'description' => '',                           // defult: null
 			'priority' => 30,                              // default: null
 			'capability' => 'edit_theme_options',          // default: edit_theme_options
@@ -215,7 +215,7 @@ $args = array(
 				// Section
 				// See: https://developer.wordpress.org/reference/classes/wp_customize_manager/add_section/
 				'general' => array(
-					'title' => __( 'General Colors', 'theme-slug' ), // required
+					'title' => esc_html__( 'General Colors', 'theme-slug' ), // required
 					'description' => '',                             // default: null
 					'priority' => 20,                                // default: null
 					'active_callback' => '',                         // default: null
@@ -225,7 +225,7 @@ $args = array(
 						// See: https://developer.wordpress.org/reference/classes/wp_customize_manager/add_setting/
 						// See: https://developer.wordpress.org/reference/classes/wp_customize_manager/add_control/
 						'background' => array(
-							'label' => __( 'Background Color', 'theme-slug' ), // required
+							'label' => esc_html__( 'Background Color', 'theme-slug' ), // required
 							'description' => '',                               // default: null
 							'priority' => '',                                  // default: null
 							'selectors' => 'body',                             // required
